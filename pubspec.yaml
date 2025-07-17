@@ -1,19 +1,19 @@
 # pubspec.yaml
 
 name: virus_total_scanner
-description: Advanced VirusTotal Scanner with clipboard monitoring and KDE integration
+description: Advanced VirusTotal Scanner with clipboard monitoring and multi-platform support
 version: 2.0.0+1
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
-  flutter: '>=3.10.0'
+  flutter: '>=3.16.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
   # HTTP requests
-  http: ^1.1.0
+  http: ^1.2.0
   
   # Local notifications
   flutter_local_notifications: ^17.0.0
@@ -47,7 +47,10 @@ dev_dependencies:
     sdk: flutter
 
   # Linting
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
+  
+  # Build runner for code generation
+  build_runner: ^2.4.7
 
 flutter:
   uses-material-design: true
