@@ -64,29 +64,39 @@ class NotificationService {
   }
 
   Future<void> _initializeLinuxNotifications() async {
-    const LinuxInitializationSettings initializationSettingsLinux =
-        LinuxInitializationSettings(
-      defaultActionName: 'Open notification',
-      defaultIcon: AssetsLinuxIcon('icons/app_icon.png'),
-    );
+    try {
+      const LinuxInitializationSettings initializationSettingsLinux =
+          LinuxInitializationSettings(
+        defaultActionName: 'Open notification',
+        defaultIcon: AssetsLinuxIcon('icons/app_icon.png'),
+      );
 
-    const InitializationSettings initializationSettings =
-        InitializationSettings(linux: initializationSettingsLinux);
+      const InitializationSettings initializationSettings =
+          InitializationSettings(linux: initializationSettingsLinux);
 
-    await _flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: _onNotificationTapped,
-    );
+      await _flutterLocalNotificationsPlugin.initialize(
+        initializationSettings,
+        onDidReceiveNotificationResponse: _onNotificationTapped,
+      );
+    } catch (e) {
+      print('خطأ في تهيئة إشعارات Linux: $e');
+      // استخدام إشعارات النظام كبديل
+      await _initializeFallbackNotifications();
+    }
   }
 
   Future<void> _initializeWindowsNotifications() async {
-    // إعداد إشعارات Windows إذا كانت متاحة
     try {
-      // يمكن إضافة إعدادات خاصة بـ Windows هنا
       print('تهيئة إشعارات Windows');
+      // يمكن إضافة إعدادات خاصة بـ Windows هنا في المستقبل
     } catch (e) {
       print('خطأ في تهيئة إشعارات Windows: $e');
     }
+  }
+
+  Future<void> _initializeFallbackNotifications() async {
+    // إعدادات احتياطية للمنصات غير المدعومة
+    print('استخدام إشعارات احتياطية');
   }
 
   Future<void> _createNotificationChannel() async {
@@ -168,6 +178,7 @@ class NotificationService {
       }
     } catch (e) {
       print('خطأ في إرسال الإشعار: $e');
+      await _showFallbackNotification(title, body);
     }
   }
 
@@ -207,40 +218,60 @@ class NotificationService {
     String? payload,
     Importance importance,
   ) async {
-    LinuxNotificationUrgency urgency;
-    switch (importance) {
-      case Importance.high:
-      case Importance.max:
-        urgency = LinuxNotificationUrgency.critical;
-        break;
-      case Importance.defaultImportance:
-        urgency = LinuxNotificationUrgency.normal;
-        break;
-      default:
-        urgency = LinuxNotificationUrgency.low;
+    try {
+      LinuxNotificationUrgency urgency;
+      switch (importance) {
+        case Importance.high:
+        case Importance.max:
+          urgency = LinuxNotificationUrgency.critical;
+          break;
+        case Importance.defaultImportance:
+          urgency = LinuxNotificationUrgency.normal;
+          break;
+        default:
+          urgency = LinuxNotificationUrgency.low;
+      }
+
+      final LinuxNotificationDetails linuxDetails = LinuxNotificationDetails(
+        urgency: urgency,
+        category: LinuxNotificationCategory.security,
+        timeout: LinuxNotificationTimeout.fromSeconds(10),
+      );
+
+      final NotificationDetails notificationDetails =
+          NotificationDetails(linux: linuxDetails);
+
+      await _flutterLocalNotificationsPlugin.show(
+        DateTime.now().millisecondsSinceEpoch.remainder(100000),
+        title,
+        body,
+        notificationDetails,
+        payload: payload,
+      );
+    } catch (e) {
+      print('خطأ في إشعار Linux: $e');
+      await _showSystemNotificationLinux(title, body);
     }
+  }
 
-    final LinuxNotificationDetails linuxDetails = LinuxNotificationDetails(
-      urgency: urgency,
-      category: LinuxNotificationCategory.security,
-      timeout: LinuxNotificationTimeout.fromSeconds(10),
-    );
-
-    final NotificationDetails notificationDetails =
-        NotificationDetails(linux: linuxDetails);
-
-    await _flutterLocalNotificationsPlugin.show(
-      DateTime.now().millisecondsSinceEpoch.remainder(100000),
-      title,
-      body,
-      notificationDetails,
-      payload: payload,
-    );
+  Future<void> _showSystemNotificationLinux(String title, String body) async {
+    try {
+      // استخدام notify-send كبديل
+      await Process.run('notify-send', [
+        '--urgency=critical',
+        '--icon=security-medium',
+        '--app-name=VirusTotal Scanner',
+        title,
+        body,
+      ]);
+    } catch (e) {
+      print('خطأ في إشعار النظام Linux: $e');
+    }
   }
 
   Future<void> _showFallbackNotification(String title, String body) async {
     // إشعار احتياطي للمنصات غير المدعومة
-    print('إشعار: $title - $body');
+    print('🔔 إشعار: $title - $body');
   }
 
   // اهتزاز الجهاز
@@ -297,13 +328,13 @@ class NotificationService {
     // يمكن إضافة منطق للتعامل مع النقر على الإشعار
   }
 
-  // إيقاف إشعار محدد
-  Future<void> cancelNotification(int id) async {
-    await _flutterLocalNotificationsPlugin.cancel(id);
-  }
-}ف جميع الإشعارات
+  // إيقاف جميع الإشعارات
   Future<void> cancelAllNotifications() async {
     await _flutterLocalNotificationsPlugin.cancelAll();
   }
 
-  // إيقا
+  // إيقاف إشعار محدد
+  Future<void> cancelNotification(int id) async {
+    await _flutterLocalNotificationsPlugin.cancel(id);
+  }
+}

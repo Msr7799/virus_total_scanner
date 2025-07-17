@@ -30,9 +30,6 @@ dependencies:
   # Date formatting
   intl: ^0.19.0
   
-  # State management (optional, for future use)
-  provider: ^6.1.1
-  
   # URL launcher (for opening links)
   url_launcher: ^6.2.4
   
@@ -51,43 +48,11 @@ dev_dependencies:
 
   # Linting
   flutter_lints: ^3.0.0
-  
-  # Build runner (for code generation)
-  build_runner: ^2.4.7
 
 flutter:
   uses-material-design: true
   
   # Assets
   assets:
-    - assets/images/
     - assets/icons/
-  
-  # Fonts (optional)
-  fonts:
-    - family: Roboto
-      fonts:
-        - asset: fonts/Roboto-Regular.ttf
-        - asset: fonts/Roboto-Bold.ttf
-          weight: 700
-
-# Platform specific configurations
-flutter:
-  # Android configuration
-  android:
-    min_sdk_version: 21
-    target_sdk_version: 34
-    compile_sdk_version: 34
-    
-  # Linux configuration  
-  linux:
-    desktop_file:
-      name: "VirusTotal Scanner"
-      comment: "Advanced URL scanner with real-time monitoring"
-      categories: ["Security", "Network"]
-      icon: "security-medium"
-      
-  # Windows configuration
-  windows:
-    app_name: "VirusTotal Scanner"
-    app_description: "Advanced URL scanner"
+    - assets/images/

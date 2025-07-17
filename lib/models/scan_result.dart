@@ -1,5 +1,9 @@
 // lib/models/scan_result.dart
 
+import 'package:flutter/material.dart';
+
+enum ThreatLevel { safe, medium, high }
+
 class ScanResult {
   final String url;
   final DateTime timestamp;
@@ -121,6 +125,3 @@ class ScanResult {
     );
   }
 }
-
-enum ThreatLevel { safe, medium, high }
-import 'package:flutter/material.dart';

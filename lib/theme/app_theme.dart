@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
+import '../models/scan_result.dart';
 
 class AppTheme {
   // الألوان الأساسية
@@ -16,6 +17,170 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
+      
+      // نظام الألوان
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: primaryColor,
+        brightness: Brightness.light,
+        error: errorColor,
+      ),
+      
+      // شريط التطبيق
+      appBarTheme: const AppBarTheme(
+        elevation: 0,
+        centerTitle: true,
+        backgroundColor: primaryColor,
+        foregroundColor: Colors.white,
+        titleTextStyle: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
+      
+      // الكروت
+      cardTheme: CardTheme(
+        elevation: Constants.defaultElevation,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(Constants.defaultBorderRadius),
+        ),
+        margin: const EdgeInsets.all(Constants.defaultPadding / 2),
+      ),
+      
+      // الأزرار المرفوعة
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryColor,
+          foregroundColor: Colors.white,
+          elevation: Constants.defaultElevation,
+          padding: const EdgeInsets.symmetric(
+            horizontal: Constants.defaultPadding * 1.5,
+            vertical: Constants.defaultPadding,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(Constants.defaultBorderRadius),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      
+      // الأزرار المحددة
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: primaryColor,
+          side: const BorderSide(color: primaryColor, width: 2),
+          padding: const EdgeInsets.symmetric(
+            horizontal: Constants.defaultPadding * 1.5,
+            vertical: Constants.defaultPadding,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(Constants.defaultBorderRadius),
+          ),
+        ),
+      ),
+      
+      // الأزرار النصية
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: primaryColor,
+          padding: const EdgeInsets.symmetric(
+            horizontal: Constants.defaultPadding,
+            vertical: Constants.defaultPadding / 2,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(Constants.defaultBorderRadius / 2),
+          ),
+        ),
+      ),
+      
+      // حقول الإدخال
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.grey[50],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(Constants.defaultBorderRadius),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(Constants.defaultBorderRadius),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(Constants.defaultBorderRadius),
+          borderSide: const BorderSide(color: primaryColor, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(Constants.defaultBorderRadius),
+          borderSide: const BorderSide(color: errorColor, width: 2),
+        ),
+        contentPadding: const EdgeInsets.all(Constants.defaultPadding),
+      ),
+      
+      // مفاتيح التبديل
+      switchTheme: SwitchThemeData(
+        thumbColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.selected)) {
+            return primaryColor;
+          }
+          return Colors.grey[400];
+        }),
+        trackColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.selected)) {
+            return primaryColor.withOpacity(0.5);
+          }
+          return Colors.grey[300];
+        }),
+      ),
+      
+      // أشرطة التقدم
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: primaryColor,
+        linearTrackColor: Colors.grey,
+      ),
+      
+      // أنماط النص
+      textTheme: const TextTheme(
+        headlineLarge: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+        headlineMedium: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+        headlineSmall: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          color: Colors.black87,
+        ),
+        titleLarge: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: Colors.black87,
+        ),
+        titleMedium: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: Colors.black87,
+        ),
+        bodyLarge: TextStyle(
+          fontSize: 16,
+          color: Colors.black87,
+        ),
+        bodyMedium: TextStyle(
+          fontSize: 14,
+          color: Colors.black87,
+        ),
+        bodySmall: TextStyle(
+          fontSize: 12,
+          color: Colors.black54,
+        ),
+      ),
       
       // أيقونات
       iconTheme: const IconThemeData(
@@ -328,7 +493,3 @@ class AppTheme {
   static const SizedBox mediumHorizontalSpace = SizedBox(width: 16);
   static const SizedBox largeHorizontalSpace = SizedBox(width: 24);
 }
-
-// تعداد مستوى التهديد (يجب أن يكون في ملف منفصل)
-// تعداد مستوى التهديد (يجب أن يكون في ملف منفصل)
-enum ThreatLevel { safe, medium, high }

@@ -1,77 +1,127 @@
-// lib/models/app_settings.dart
+// lib/models/scan_result.dart
 
-class AppSettings {
-  final bool isMonitoringEnabled;
-  final bool showOnlyThreats;
-  final bool enableSoundNotifications;
-  final bool enableVibration;
-  final int scanDelaySeconds;
-  final int maxHistoryItems;
-  final bool autoStartMonitoring;
-  final NotificationLevel notificationLevel;
+import 'package:flutter/material.dart';
 
-  AppSettings({
-    this.isMonitoringEnabled = false,
-    this.showOnlyThreats = false,
-    this.enableSoundNotifications = true,
-    this.enableVibration = true,
-    this.scanDelaySeconds = 2,
-    this.maxHistoryItems = 100,
-    this.autoStartMonitoring = false,
-    this.notificationLevel = NotificationLevel.threatsOnly,
+enum ThreatLevel { safe, medium, high }
+
+class ScanResult {
+  final String url;
+  final DateTime timestamp;
+  final int malicious;
+  final int suspicious;
+  final int clean;
+  final int undetected;
+  final int timeout;
+  final Map<String, dynamic> fullData;
+  final String status;
+  final String? permalink;
+  final List<String> threatNames;
+
+  ScanResult({
+    required this.url,
+    required this.timestamp,
+    required this.malicious,
+    required this.suspicious,
+    required this.clean,
+    required this.undetected,
+    this.timeout = 0,
+    required this.fullData,
+    required this.status,
+    this.permalink,
+    this.threatNames = const [],
   });
 
+  // تحديد مستوى الخطر
+  ThreatLevel get threatLevel {
+    if (malicious > 0) return ThreatLevel.high;
+    if (suspicious > 0) return ThreatLevel.medium;
+    return ThreatLevel.safe;
+  }
+
+  // تحديد لون النتيجة
+  Color get statusColor {
+    switch (threatLevel) {
+      case ThreatLevel.high:
+        return Colors.red;
+      case ThreatLevel.medium:
+        return Colors.orange;
+      case ThreatLevel.safe:
+        return Colors.green;
+    }
+  }
+
+  // نص حالة النتيجة
+  String get statusText {
+    switch (threatLevel) {
+      case ThreatLevel.high:
+        return 'ضار - خطر عالي';
+      case ThreatLevel.medium:
+        return 'مشبوه - خطر متوسط';
+      case ThreatLevel.safe:
+        return 'آمن';
+    }
+  }
+
+  // تحويل إلى JSON للتخزين
   Map<String, dynamic> toJson() {
     return {
-      'isMonitoringEnabled': isMonitoringEnabled,
-      'showOnlyThreats': showOnlyThreats,
-      'enableSoundNotifications': enableSoundNotifications,
-      'enableVibration': enableVibration,
-      'scanDelaySeconds': scanDelaySeconds,
-      'maxHistoryItems': maxHistoryItems,
-      'autoStartMonitoring': autoStartMonitoring,
-      'notificationLevel': notificationLevel.index,
+      'url': url,
+      'timestamp': timestamp.toIso8601String(),
+      'malicious': malicious,
+      'suspicious': suspicious,
+      'clean': clean,
+      'undetected': undetected,
+      'timeout': timeout,
+      'status': status,
+      'permalink': permalink,
+      'threatNames': threatNames,
+      'fullData': fullData,
     };
   }
 
-  factory AppSettings.fromJson(Map<String, dynamic> json) {
-    return AppSettings(
-      isMonitoringEnabled: json['isMonitoringEnabled'] ?? false,
-      showOnlyThreats: json['showOnlyThreats'] ?? false,
-      enableSoundNotifications: json['enableSoundNotifications'] ?? true,
-      enableVibration: json['enableVibration'] ?? true,
-      scanDelaySeconds: json['scanDelaySeconds'] ?? 2,
-      maxHistoryItems: json['maxHistoryItems'] ?? 100,
-      autoStartMonitoring: json['autoStartMonitoring'] ?? false,
-      notificationLevel: NotificationLevel.values[json['notificationLevel'] ?? 0],
+  // إنشاء من JSON
+  factory ScanResult.fromJson(Map<String, dynamic> json) {
+    return ScanResult(
+      url: json['url'] ?? '',
+      timestamp: DateTime.parse(json['timestamp']),
+      malicious: json['malicious'] ?? 0,
+      suspicious: json['suspicious'] ?? 0,
+      clean: json['clean'] ?? 0,
+      undetected: json['undetected'] ?? 0,
+      timeout: json['timeout'] ?? 0,
+      status: json['status'] ?? '',
+      permalink: json['permalink'],
+      threatNames: List<String>.from(json['threatNames'] ?? []),
+      fullData: json['fullData'] ?? {},
     );
   }
 
-  AppSettings copyWith({
-    bool? isMonitoringEnabled,
-    bool? showOnlyThreats,
-    bool? enableSoundNotifications,
-    bool? enableVibration,
-    int? scanDelaySeconds,
-    int? maxHistoryItems,
-    bool? autoStartMonitoring,
-    NotificationLevel? notificationLevel,
+  // نسخة محدثة من النتيجة
+  ScanResult copyWith({
+    String? url,
+    DateTime? timestamp,
+    int? malicious,
+    int? suspicious,
+    int? clean,
+    int? undetected,
+    int? timeout,
+    Map<String, dynamic>? fullData,
+    String? status,
+    String? permalink,
+    List<String>? threatNames,
   }) {
-    return AppSettings(
-      isMonitoringEnabled: isMonitoringEnabled ?? this.isMonitoringEnabled,
-      showOnlyThreats: showOnlyThreats ?? this.showOnlyThreats,
-      enableSoundNotifications: enableSoundNotifications ?? this.enableSoundNotifications,
-      enableVibration: enableVibration ?? this.enableVibration,
-      scanDelaySeconds: scanDelaySeconds ?? this.scanDelaySeconds,
-      maxHistoryItems: maxHistoryItems ?? this.maxHistoryItems,
-      autoStartMonitoring: autoStartMonitoring ?? this.autoStartMonitoring,
-      notificationLevel: notificationLevel ?? this.notificationLevel,
+    return ScanResult(
+      url: url ?? this.url,
+      timestamp: timestamp ?? this.timestamp,
+      malicious: malicious ?? this.malicious,
+      suspicious: suspicious ?? this.suspicious,
+      clean: clean ?? this.clean,
+      undetected: undetected ?? this.undetected,
+      timeout: timeout ?? this.timeout,
+      fullData: fullData ?? this.fullData,
+      status: status ?? this.status,
+      permalink: permalink ?? this.permalink,
+      threatNames: threatNames ?? this.threatNames,
     );
   }
-}
-
-enum NotificationLevel {
-  all,        // جميع النتائج
-  threatsOnly, // التهديدات فقط
-  none,       // بدون إشعارات
 }
