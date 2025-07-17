@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'screens/home_screen.dart';
 import 'theme/app_theme.dart';
 import 'services/notification_service.dart';
@@ -41,11 +42,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Advanced VirusTotal Scanner',
       
-      // إعدادات اللغة والاتجاه
+      // إعدادات اللغة والتوطين
       locale: const Locale('ar', 'SA'),
       supportedLocales: const [
         Locale('ar', 'SA'), // العربية
         Locale('en', 'US'), // الإنجليزية
+      ],
+      
+      // إضافة المحولات المطلوبة للتوطين
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
       ],
       
       // الثيمات

@@ -56,6 +56,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> _loadInitialData() async {
+    if (!mounted) return;
+    
     try {
       _settings = _storageService.getSettings();
       _recentResults = _storageService.getScanHistory().take(5).toList();
@@ -65,7 +67,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         await _clipboardService.startMonitoring();
       }
       
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     } catch (e) {
       print('خطأ في تحميل البيانات الأولية: $e');
     }
@@ -82,9 +86,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         });
         
         // تشغيل الرسوم المتحركة للنتيجة الجديدة
-        _scanAnimationController.forward().then((_) {
-          _scanAnimationController.reset();
-        });
+        if (mounted) {
+          _scanAnimationController.forward().then((_) {
+            if (mounted) {
+              _scanAnimationController.reset();
+            }
+          });
+        }
       }
     });
   }
@@ -95,15 +103,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       return;
     }
 
-    setState(() {
-      _isScanning = true;
-      _currentScanResult = null;
-    });
+    if (mounted) {
+      setState(() {
+        _isScanning = true;
+        _currentScanResult = null;
+      });
+    }
 
     try {
       final result = await _virusTotalService.scanUrl(url);
       
-      if (result != null) {
+      if (result != null && mounted) {
         await _storageService.addScanResult(result);
         
         setState(() {
@@ -114,39 +124,53 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           }
         });
         
-        _scanAnimationController.forward().then((_) {
-          _scanAnimationController.reset();
-        });
+        if (mounted) {
+          _scanAnimationController.forward().then((_) {
+            if (mounted) {
+              _scanAnimationController.reset();
+            }
+          });
+        }
         
         _showSnackBar('تم الفحص بنجاح');
-      } else {
+      } else if (mounted) {
         _showSnackBar('فشل في فحص الرابط', isError: true);
       }
     } catch (e) {
-      _showSnackBar('خطأ في الفحص: $e', isError: true);
+      if (mounted) {
+        _showSnackBar('خطأ في الفحص: $e', isError: true);
+      }
     } finally {
-      setState(() {
-        _isScanning = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isScanning = false;
+        });
+      }
     }
   }
 
   Future<void> _toggleMonitoring() async {
     try {
       await _clipboardService.toggleMonitoring();
-      _settings = _storageService.getSettings();
-      setState(() {});
-      
-      final message = _clipboardService.isMonitoring 
-          ? 'تم تفعيل مراقبة الحافظة' 
-          : 'تم إيقاف مراقبة الحافظة';
-      _showSnackBar(message);
+      if (mounted) {
+        _settings = _storageService.getSettings();
+        setState(() {});
+        
+        final message = _clipboardService.isMonitoring 
+            ? 'تم تفعيل مراقبة الحافظة' 
+            : 'تم إيقاف مراقبة الحافظة';
+        _showSnackBar(message);
+      }
     } catch (e) {
-      _showSnackBar('خطأ في تغيير حالة المراقبة: $e', isError: true);
+      if (mounted) {
+        _showSnackBar('خطأ في تغيير حالة المراقبة: $e', isError: true);
+      }
     }
   }
 
   void _showSnackBar(String message, {bool isError = false}) {
+    if (!mounted) return;
+    
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -304,10 +328,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         AnimatedBuilder(
           animation: _scanAnimation,
           builder: (context, child) {
+            // التأكد من أن القيم صالحة
+            final scaleValue = _scanAnimation.value.isFinite ? 
+                (0.8 + (0.2 * _scanAnimation.value)).clamp(0.0, 2.0) : 1.0;
+            final opacityValue = _scanAnimation.value.isFinite ? 
+                (0.5 + (0.5 * _scanAnimation.value)).clamp(0.0, 1.0) : 1.0;
+            
             return Transform.scale(
-              scale: 0.8 + (0.2 * _scanAnimation.value),
+              scale: scaleValue,
               child: Opacity(
-                opacity: 0.5 + (0.5 * _scanAnimation.value),
+                opacity: opacityValue,
                 child: child,
               ),
             );
@@ -490,7 +520,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget _buildFloatingActionButton() {
     return FloatingActionButton.extended(
-      onPressed: _clipboardService.isMonitoring ? _toggleMonitoring : _toggleMonitoring,
+      onPressed: _toggleMonitoring,
       icon: Icon(_clipboardService.isMonitoring ? Icons.pause : Icons.play_arrow),
       label: Text(_clipboardService.isMonitoring ? 'إيقاف المراقبة' : 'بدء المراقبة'),
       backgroundColor: _clipboardService.isMonitoring 
@@ -502,7 +532,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Future<void> _scanClipboard() async {
     try {
       final result = await _clipboardService.scanCurrentClipboard();
-      if (result != null) {
+      if (result != null && mounted) {
         await _storageService.addScanResult(result);
         setState(() {
           _currentScanResult = result;
@@ -512,11 +542,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           }
         });
         _showSnackBar('تم فحص محتوى الحافظة');
-      } else {
+      } else if (mounted) {
         _showSnackBar('لا يوجد رابط صالح في الحافظة', isError: true);
       }
     } catch (e) {
-      _showSnackBar('خطأ في فحص الحافظة: $e', isError: true);
+      if (mounted) {
+        _showSnackBar('خطأ في فحص الحافظة: $e', isError: true);
+      }
     }
   }
 

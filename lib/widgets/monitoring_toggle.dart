@@ -77,12 +77,16 @@ class _MonitoringToggleState extends State<MonitoringToggle>
   }
 
   void _startPulseAnimation() {
-    _pulseController.repeat(reverse: true);
+    if (mounted) {
+      _pulseController.repeat(reverse: true);
+    }
   }
 
   void _stopPulseAnimation() {
-    _pulseController.stop();
-    _pulseController.reset();
+    if (mounted) {
+      _pulseController.stop();
+      _pulseController.reset();
+    }
   }
 
   @override
@@ -143,13 +147,21 @@ class _MonitoringToggleState extends State<MonitoringToggle>
         AnimatedBuilder(
           animation: _pulseAnimation,
           builder: (context, child) {
+            // إصلاح المشكلة: التأكد من أن القيمة صالحة
+            final scale = widget.isMonitoring ? 
+                (_pulseAnimation.value.isFinite ? _pulseAnimation.value : 1.0) : 1.0;
+            
             return Transform.scale(
-              scale: widget.isMonitoring ? _pulseAnimation.value : 1.0,
+              scale: scale,
               child: AnimatedBuilder(
                 animation: _iconRotation,
                 builder: (context, child) {
+                  // إصلاح المشكلة: التأكد من أن الزاوية صالحة
+                  final angle = _iconRotation.value.isFinite ? 
+                      _iconRotation.value * 0.1 : 0.0;
+                  
                   return Transform.rotate(
-                    angle: _iconRotation.value * 0.1,
+                    angle: angle,
                     child: Icon(
                       widget.isMonitoring ? Icons.visibility : Icons.visibility_off,
                       color: widget.isMonitoring
@@ -262,11 +274,15 @@ class _MonitoringToggleState extends State<MonitoringToggle>
           AnimatedBuilder(
             animation: _pulseAnimation,
             builder: (context, child) {
+              // إصلاح المشكلة: التأكد من أن القيمة صالحة
+              final opacity = _pulseAnimation.value.isFinite ? 
+                  (_pulseAnimation.value * 0.5 + 0.5).clamp(0.0, 1.0) : 1.0;
+              
               return Container(
                 width: 8,
                 height: 8,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(_pulseAnimation.value * 0.5 + 0.5),
+                  color: Colors.white.withOpacity(opacity),
                   shape: BoxShape.circle,
                 ),
               );

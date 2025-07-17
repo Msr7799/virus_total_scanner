@@ -65,10 +65,11 @@ class NotificationService {
 
   Future<void> _initializeLinuxNotifications() async {
     try {
+      // تبسيط إعدادات Linux لتجنب الأخطاء
       const LinuxInitializationSettings initializationSettingsLinux =
           LinuxInitializationSettings(
         defaultActionName: 'Open notification',
-        defaultIcon: AssetsLinuxIcon('icons/app_icon.png'),
+        // إزالة الأيقونة المشكلة
       );
 
       const InitializationSettings initializationSettings =
@@ -119,7 +120,7 @@ class NotificationService {
 
   // إرسال إشعار للتهديدات
   Future<void> showThreatNotification(ScanResult result) async {
-    final settings = await StorageService().getSettings();
+    final settings = StorageService().getSettings();
     
     // التحقق من إعدادات الإشعارات
     if (settings.notificationLevel == NotificationLevel.none) return;
@@ -234,8 +235,7 @@ class NotificationService {
 
       final LinuxNotificationDetails linuxDetails = LinuxNotificationDetails(
         urgency: urgency,
-        category: LinuxNotificationCategory.security,
-        timeout: LinuxNotificationTimeout.fromSeconds(10),
+        // إزالة الخصائص المشكلة
       );
 
       final NotificationDetails notificationDetails =

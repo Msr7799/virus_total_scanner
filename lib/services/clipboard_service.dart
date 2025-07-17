@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:clipboard_watcher/clipboard_watcher.dart';
 import '../utils/validators.dart';
 import '../models/scan_result.dart';
+import '../models/app_settings.dart'; // إضافة الاستيراد المفقود
 import 'virus_total_service.dart';
 import 'notification_service.dart';
 import 'storage_service.dart';
@@ -36,7 +37,7 @@ class ClipboardService with ClipboardListener {
       print('تم بدء مراقبة الحافظة');
       
       // حفظ حالة المراقبة
-      final settings = await StorageService().getSettings();
+      final settings = StorageService().getSettings();
       await StorageService().saveSettings(
         settings.copyWith(isMonitoringEnabled: true)
       );
@@ -62,7 +63,7 @@ class ClipboardService with ClipboardListener {
       print('تم إيقاف مراقبة الحافظة');
       
       // حفظ حالة المراقبة
-      final settings = await StorageService().getSettings();
+      final settings = StorageService().getSettings();
       await StorageService().saveSettings(
         settings.copyWith(isMonitoringEnabled: false)
       );
@@ -123,7 +124,7 @@ class ClipboardService with ClipboardListener {
   // فحص الرابط في الخلفية
   Future<void> _scanUrlInBackground(String url) async {
     try {
-      final settings = await StorageService().getSettings();
+      final settings = StorageService().getSettings();
       
       // تطبيق تأخير لتجنب الطلبات المتكررة
       await Future.delayed(Duration(seconds: settings.scanDelaySeconds));
@@ -151,7 +152,7 @@ class ClipboardService with ClipboardListener {
 
   // التعامل مع نتيجة الفحص
   Future<void> _handleScanResult(ScanResult result) async {
-    final settings = await StorageService().getSettings();
+    final settings = StorageService().getSettings();
     
     // إرسال إشعار حسب مستوى التهديد والإعدادات
     switch (settings.notificationLevel) {

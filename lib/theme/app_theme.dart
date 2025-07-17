@@ -38,8 +38,8 @@ class AppTheme {
         ),
       ),
       
-      // الكروت
-      cardTheme: CardTheme(
+      // الكروت - استخدام CardThemeData بدلاً من CardTheme
+      cardTheme: CardThemeData(
         elevation: Constants.defaultElevation,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(Constants.defaultBorderRadius),
@@ -121,14 +121,14 @@ class AppTheme {
       
       // مفاتيح التبديل
       switchTheme: SwitchThemeData(
-        thumbColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return primaryColor;
           }
           return Colors.grey[400];
         }),
-        trackColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return primaryColor.withOpacity(0.5);
           }
           return Colors.grey[300];
@@ -199,8 +199,8 @@ class AppTheme {
       
       // أشرطة التمرير
       scrollbarTheme: ScrollbarThemeData(
-        thumbColor: MaterialStateProperty.all(primaryColor.withOpacity(0.5)),
-        trackColor: MaterialStateProperty.all(Colors.grey[200]),
+        thumbColor: WidgetStateProperty.all(primaryColor.withOpacity(0.5)),
+        trackColor: WidgetStateProperty.all(Colors.grey[200]),
         radius: const Radius.circular(Constants.defaultBorderRadius / 2),
       ),
     );
@@ -233,7 +233,7 @@ class AppTheme {
       ),
       
       // الكروت الداكنة
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: Constants.defaultElevation,
         color: Colors.grey[850],
         shape: RoundedRectangleBorder(
